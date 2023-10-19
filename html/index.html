@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Previsão do Tempo</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div id="weather-container">
+        <div id="location">Cidade, País</div>
+        <div id="temperature">--°C</div>
+        <div id="description">Condição</div>
+    </div>
+    <form>
+        <input type="text" id="cidadeInput" oninput="buscarCidades()">
+      </form>
+      <div id="listaCidades"></div>
+      
+      <script>
+        function buscarCidades() {
+          var input = document.getElementById("cidadeInput").value;
+          var listaCidades = document.getElementById("listaCidades");
+    
+          // Limpe a lista de cidades
+          listaCidades.innerHTML = "";
+    
+          if (input.length >= 3) { // Verifique se o usuário digitou pelo menos 3 caracteres
+            // Faça uma solicitação para uma API de sugestão de cidades
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${input}`)
+              .then(response => response.json())
+              .then(data => {
+                data.forEach(result => {
+                    const part = result.display_name.split(', ');
+                    const CEP = part[0] + ',' + part[3] + ',' + part[5];
+                    listaCidades.innerHTML += `<div>${CEP}</div>`;
+                    // listaCidades.innerHTML += `<div>${result.display_name}</div>`;
+                });
+              })
+              .catch(error => {
+                console.error("Erro na busca de cidades:", error);
+              });
+          }
+        }
+      </script>
+    <!-- <script language="javascript" type="type/javascript" href="../js/script.js"></script> -->
+</body>
+</html>

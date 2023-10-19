@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+}
+#weather-container {
+    width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+#location {
+    font-size: 24px;
+}
+#temperature {
+    font-size: 48px;
+}
+#description {
+    font-size: 18px;
+}
