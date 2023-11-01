@@ -1,103 +1,87 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <title>Previsão do Tempo</title>
-    <style>
-        #listaCidades {
-            display: none;
-            border: 1px solid #ccc;
-            max-height: 150px;
-            overflow-y: auto;
-        }
+  <title>Previsão do Tempo</title>
+  <style>
+    #listaCidades {
+      display: none;
+      border: 1px solid #ccc;
+      max-height: 150px;
+      overflow-y: auto;
+    }
 
-        #listaCidades div {
-            padding: 5px;
-            cursor: pointer;
-        }
-    </style>
+    #listaCidades div {
+      padding: 5px;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
-    <form>
-        <input type="text" id="cidadeInput" oninput="buscarCidades()">
-    </form>
-    <div id="listaCidades"></div>
+  <form>
+    <input type="text" id="cidadeInput" oninput="buscarCidades()" onblur="ocultarLista()">
+  </form>
+  <div id="listaCidades"></div>
 
-    <script>
-        const apikey = '9419491b ';
-        function buscarCidades() {
-            var input = document.getElementById("cidadeInput").value;
-            var listaCidades = document.getElementById("listaCidades");
+  <script>
+    const apikey = 'f0f1a34f679661b3969a3738a5494b6c'
+    function buscarCidades() {
+      var input = document.getElementById("cidadeInput").value;
+      var listaCidades = document.getElementById("listaCidades");
 
-            // Limpe a lista de cidades
-            listaCidades.innerHTML = "";
+      // Limpe a lista de cidades
+      listaCidades.innerHTML = "";
 
-            if (input.length >= 3) { // Verifique se o usuário digitou pelo menos 3 caracteres
-                // Faça uma solicitação para a API de sugestão de cidades
-                fetch(`https://api.hgbrasil.com/weather?valid_key=${apikey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log(data);
-                        // if (data.length > 0) {
-                        //     listaCidades.style.display = "block"; // Exiba a lista
-                        //     data.forEach(result => {
-                        //         const cidadeNome = result.display_name;
-                        //         const cidadeLat = result.lat;
-                        //         const cidadeLon = result.lon;
-
-                        //         const cidadeItem = document.createElement("div");
-                        //         cidadeItem.textContent = cidadeNome;
-                        //         cidadeItem.onclick = function () {
-                        //             // Preencha o campo de entrada com a cidade selecionada
-                        //             document.getElementById("cidadeInput").value = cidadeNome;
-                        //             // Oculte a lista
-                        //             listaCidades.style.display = "none";
-                        //             // Use as coordenadas (latitude e longitude) para fazer uma solicitação à API do Climatempo
-                        //             console.log(cidadeLat, cidadeLon)
-                        //             getID(cidadeLat, cidadeLon);
-                        //         };
-                        //         listaCidades.appendChild(cidadeItem);
-                        //     });
-                        // }
-                    })
-                    .catch(error => {
-                        console.error("Erro na busca de cidades:", error);
-                    });
+      if (input.length >= 3) { // Verifique se o usuário digitou pelo menos 3 caracteres
+        // Faça uma solicitação para uma API de sugestão de cidades
+        fetch(`http://apiadvisor.climatempo.com.br/api/v1/locale/city?name=${input}&token=${apikey}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.length > 0) {
+              listaCidades.style.display = "block"; // Exiba a lista
+              data.forEach(result => {
+                const cidadeNome = result.name;
+                const cidadeId = result.id;
+                const cidadeItem = document.createElement("button");
+                cidadeItem.textContent = cidadeNome;
+                cidadeItem.onclick = function () {
+                  // Preencha o campo de entrada com a cidade selecionada
+                  document.getElementById("cidadeInput").value = cidadeNome;
+                  // Oculte a lista
+                  listaCidades.style.display = "none";
+                  consultarClima(cidadeId);
+                };
+                listaCidades.appendChild(cidadeItem);
+              });
             } else {
-                listaCidades.style.display = "none"; // Oculte a lista se o campo de entrada estiver vazio
+              listaCidades.style.display = "none"; // Oculte a lista se não houver correspondências
             }
-        }
+          })
+          .catch(error => {
+            console.error("Erro na busca de cidades:", error);
+          });
+      } else {
+        listaCidades.style.display = "none"; // Oculte a lista se o campo de entrada estiver vazio
+      }
+    }
 
-        function getID(latitude, longitude) {
-            // Use a latitude e longitude para fazer uma solicitação à API do Climatempo
-            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`)
-                .then(response => response.json())
-                .then(data => {
-                    const id = data.place_id;
-                    // console.log(data);
-                    fetchWeather(id);
-                })
-                .catch(error => {
-                    console.error("Erro na consulta de clima:", error);
-                });
-        }
+    function consultarClima(city_number) {
+        // Use a latitude e longitude para fazer uma solicitação à API do Climatempo
+        fetch(`http://apiadvisor.climatempo.com.br/api/v1/weather/locale/${city_number}/current?token=${apikey}`)
+          .then((response) => response.json())
+          .then((data) => {
+            // Processar os dados do clima retornado pela API do Climatempo
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Erro na consulta de clima:", error);
+          });
+      }
 
-        function fetchWeather(id) {
-            fetch(`http://apiadvisor.climatempo.com.br/api/v1/weather/locale/${id}/current?token=${apikey}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    const { name, weather, temperature, wind_velocity, humidity, icon } = data;
-
-                    const cityElement = document.querySelector(".city");
-                    const tempElement = document.querySelector(".temperautre");
-                    const humidityElement = document.querySelector(".humidity");
-                    const windElement = document.querySelector(".wind_velocity");
-
-                    console.log(data);
-                });
-        }
-    </script>
+    function ocultarLista() {
+      var listaCidades = document.getElementById("listaCidades");
+      // Oculte a lista quando o usuário clica fora dela ou pressiona "Esc"
+      listaCidades.style.display = "none";
+    }
+  </script>
 </body>
-
 </html>

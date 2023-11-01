@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Previsão do Tempo</title>
+</head>
+<body>
+  <form>
+    <input type="text" id="cidadeInput" oninput="buscarCidades()">
+  </form>
+  <div id="listaCidades"></div>
+
+  <script>
+    const chaveapi = 'f0f1a34f679661b3969a3738a5494b6c'
+
+    function buscarCidades() {
+      var input = document.getElementById("cidadeInput").value;
+      var listaCidades = document.getElementById("listaCidades");
+
+      // Limpe a lista de cidades
+      listaCidades.innerHTML = "";
+
+      if (input.length >= 3) { // Verifique se o usuário digitou pelo menos 3 caracteres
+        // Faça uma solicitação para uma API de sugestão de cidades
+        fetch(`http://apiadvisor.climatempo.com.br/api/v1/locale/city?name=${input}&token=${chaveapi}`)
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(result => {
+              // Use o innerHTML para adicionar o nome da cidade
+              listaCidades.innerHTML += `<div>${result.name}</div>`;
+            });
+          })
+          .catch(error => {
+            console.error("Erro na busca de cidades:", error);
+          });
+      }
+    }
+  </script>
+</body>
+</html>
