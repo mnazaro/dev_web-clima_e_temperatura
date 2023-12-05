@@ -1,87 +1,58 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Previsão do Tempo</title>
-  <style>
-    #listaCidades {
-      display: none;
-      border: 1px solid #ccc;
-      max-height: 150px;
-      overflow-y: auto;
-    }
-
-    #listaCidades div {
-      padding: 5px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <form>
-    <input type="text" id="cidadeInput" oninput="buscarCidades()" onblur="ocultarLista()">
-  </form>
-  <div id="listaCidades"></div>
-
-  <script>
-    const apikey = 'f0f1a34f679661b3969a3738a5494b6c'
-    function buscarCidades() {
-      var input = document.getElementById("cidadeInput").value;
-      var listaCidades = document.getElementById("listaCidades");
-
-      // Limpe a lista de cidades
-      listaCidades.innerHTML = "";
-
-      if (input.length >= 3) { // Verifique se o usuário digitou pelo menos 3 caracteres
-        // Faça uma solicitação para uma API de sugestão de cidades
-        fetch(`http://apiadvisor.climatempo.com.br/api/v1/locale/city?name=${input}&token=${apikey}`)
-          .then(response => response.json())
-          .then(data => {
-            if (data.length > 0) {
-              listaCidades.style.display = "block"; // Exiba a lista
-              data.forEach(result => {
-                const cidadeNome = result.name;
-                const cidadeId = result.id;
-                const cidadeItem = document.createElement("button");
-                cidadeItem.textContent = cidadeNome;
-                cidadeItem.onclick = function () {
-                  // Preencha o campo de entrada com a cidade selecionada
-                  document.getElementById("cidadeInput").value = cidadeNome;
-                  // Oculte a lista
-                  listaCidades.style.display = "none";
-                  consultarClima(cidadeId);
-                };
-                listaCidades.appendChild(cidadeItem);
-              });
-            } else {
-              listaCidades.style.display = "none"; // Oculte a lista se não houver correspondências
-            }
-          })
-          .catch(error => {
-            console.error("Erro na busca de cidades:", error);
-          });
-      } else {
-        listaCidades.style.display = "none"; // Oculte a lista se o campo de entrada estiver vazio
-      }
-    }
-
-    function consultarClima(city_number) {
-        // Use a latitude e longitude para fazer uma solicitação à API do Climatempo
-        fetch(`http://apiadvisor.climatempo.com.br/api/v1/weather/locale/${city_number}/current?token=${apikey}`)
-          .then((response) => response.json())
-          .then((data) => {
-            // Processar os dados do clima retornado pela API do Climatempo
-            console.log(data);
-          })
-          .catch((error) => {
-            console.error("Erro na consulta de clima:", error);
-          });
-      }
-
-    function ocultarLista() {
-      var listaCidades = document.getElementById("listaCidades");
-      // Oculte a lista quando o usuário clica fora dela ou pressiona "Esc"
-      listaCidades.style.display = "none";
-    }
-  </script>
-</body>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Previsão do Tempo</title>
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body class="dark-mode">
+    <div class="weather-container">
+      <div class="header">
+        <h1>Previsão do Tempo</h1>
+        <!-- <div class="toggle-dark-mode">
+          <label for="dark-mode">Modo Escuro</label>
+          <input type="checkbox" id="dark-mode" onchange="toggleDarkMode()" />
+        </div> -->
+      </div>
+      <div class="search-container">
+        <div class="location">
+          <label for="city">Cidade:</label>
+          <input
+            type="text"
+            id="cidadeInput"
+            placeholder="Digite o nome da cidade"
+            oninput="buscarCidades()"
+            autocomplete="off"
+          />
+          <ul id="listaCidades"></ul>
+        </div>
+      </div>
+      <div class="main-info">
+        <div class="current-weather">
+          <h2 id="location-name">Nome da Cidade</h2>
+          <img id="weather-icon" alt="Condição climática" />
+          <p id="temperature">--°C</p>
+          <p id="description">Descrição da condição climática</p>
+        </div>
+        <div class="additional-info">
+          <p id="max-temp">Máxima: --°C</p>
+          <p id="min-temp">Mínima: --°C</p>
+          <p id="pressure">Pressão: ---- hPa</p>
+          <p id="humidity">Umidade: --%</p>
+          <p id="wind">Vento: -- m/s</p>
+        </div>
+      </div>
+    </div>
+    <div class="form-container">
+      <!-- Espaço para formulários -->
+      <form>
+        <!-- Seu primeiro formulário aqui -->
+      </form>
+      <form>
+        <!-- Seu segundo formulário aqui -->
+      </form>
+    </div>
+    <script src="../js/script.js"></script>
+  </body>
 </html>
